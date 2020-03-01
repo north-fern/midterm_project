@@ -21,8 +21,8 @@ eyes = UltrasonicSensor(Port.S4)
 
 
 def setup_systemlink():
-    print("SETTING UP SYSTEMLINK")
-    urlBase = "https://api.systemlinkcloud.com/nitag/v2/tags"
+    #print("SETTING UP SYSTEMLINK")
+    urlBase = "https://api.systemlinkcloud.com/nitag/v2/tags/"
     headers = {"Accept": "application/json", "x-ni-api-key": Key}
     return urlBase, headers
 
@@ -35,7 +35,7 @@ def send_to_system_link(Tag, Type, Value):
     try:
         reply = urequests.put(urlVal, headers = headers, json = propVal).text
     except Exception as e:
-        print(3)
+        print(e)
         reply = 'failed'
     return reply
 
@@ -44,8 +44,8 @@ def get_from_system_link(Tag):
     urlVal = urlBase + Tag + "/values/current"
     try:
         value = urequests.get(urlVal, headers = headers).text
-        data = ujson.loads(values)
-        print(data)
+        data = ujson.loads(value)
+        #print(data)
         result = data.get("value").get("value")
     except Exception as e:
         print(e)
@@ -54,7 +54,7 @@ def get_from_system_link(Tag):
 
 def get_sensor_value():
     dist = eyes.distance()
-    print("Distnce is: " , dist/10)
+    print("Distance is: " , dist/10)
     return dist/10
 
 def throw_object(distance):
@@ -64,20 +64,26 @@ def throw_object(distance):
 
 
 url, headers = setup_systemlink()
+print("SETUP SYSLINK")
 wait(1000)
 dis = get_sensor_value()
-send_to_system_link("DISTANCE", "INTEGER", dis)
-mode = get_from_system_link("MODE")
-    if mode == 0:
-        print("MODE IS PHYSICS")
-    elif mode == 1:
-        print("MODE IS AI")
-    elif mode == 2:
-        print("MODE IS MOVE CLOSER")
+wait(1000)
+rep = send_to_system_link('DIST', 'STRING', str(dis))
+print(rep)
+print("SENT SENSOR VALUE")
+mode = get_from_system_link('MODE')
+print(type(mode))
+print("GOT MODE")
+if mode == '0':
+    print("MODE IS PHYSICS")
+elif mode == '1':
+    print("MODE IS AI")
+elif mode == '2':
+    print("MODE IS MOVE CLOSER")
 go = False
 while go == False:
-    throw = get_from_system_link("THROW")
+    throw = get_from_system_link('THROW')
     if throw == 'false':
         go = True
         print("THROWING OBJECT")
-#throw_object(4)
+        throw_object(4)
