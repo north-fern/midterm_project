@@ -57,33 +57,49 @@ def get_sensor_value():
     print("Distance is: " , dist/10)
     return dist/10
 
-def throw_object(distance):
+def throw_object(spd):
     print("throwing object")
-    thrower.run(600)
-    wait(1500)
+    thrower.run(spd)
+    wait(4000*(100/spd))
+
+def physics_model(dist):
+    dist = dist / 100
+    spd = (dist * 9.81 / (.90189))**(1/2)
+    spd = (spd * 180 / (.14 * 3.141592653)) -110 ## correction factor from testing
+    # eqns based on http://aboutscience.net/projectile-motion-equations/
+    print(spd)
+    return spd
 
 
-url, headers = setup_systemlink()
-print("SETUP SYSLINK")
-wait(1000)
-dis = get_sensor_value()
-wait(1000)
-rep = send_to_system_link('DIST', 'STRING', str(dis))
-print(rep)
-print("SENT SENSOR VALUE")
-mode = get_from_system_link('MODE')
-print(type(mode))
-print("GOT MODE")
-if mode == '0':
-    print("MODE IS PHYSICS")
-elif mode == '1':
-    print("MODE IS AI")
-elif mode == '2':
-    print("MODE IS MOVE CLOSER")
-go = False
-while go == False:
-    throw = get_from_system_link('THROW')
-    if throw == 'false':
-        go = True
-        print("THROWING OBJECT")
-        throw_object(4)
+
+
+# url, headers = setup_systemlink()
+# print("SETUP SYSLINK")
+# wait(1000)
+# dis = get_sensor_value()
+# wait(1000)
+# rep = send_to_system_link('DIST', 'STRING', str(dis))
+# print(rep)
+# print("SENT SENSOR VALUE")
+# mode = get_from_system_link('MODE')
+# print(type(mode))
+# print("GOT MODE")
+# if mode == '0':
+#     print("MODE IS PHYSICS")
+#     spd = physics_model(dis)
+# elif mode == '1':
+#     print("MODE IS AI")
+#     spd = 600
+# else:
+#     print("MODE IS MOVE CLOSER")
+#     spd = 600
+# go = False
+# while go == False:
+#     throw = get_from_system_link('THROW')
+#     if throw == 'false':
+#         go = True
+#         print("THROWING OBJECT")
+#         throw_object(spd)
+dist = get_sensor_value() / 10
+print(dist)
+throw_object(350)
